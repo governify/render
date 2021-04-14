@@ -15,100 +15,96 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
+along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 'use strict';
 
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 const path = require('path');
 const fs = require('fs');
-const axios = require('axios')
-const jsyaml = require('js-yaml')
-const mustache = require("mustache");
+const jsyaml = require('js-yaml');
+const mustache = require('mustache');
 mustache.escape = function (text) { return text; };
-const config = require('./configurations')
+const governify = require('governify-commons');
 
-const logger = require("./logger");
+const config = require('./configurations');
+const logger = require('./logger');
 
 module.exports = router;
 
 router.get('/', function (req, res) {
-    var viewPath = config.default_render.view;
-    var ctrlPath = config.default_render.controller;
-    var modelPath = config.default_render.model;
-    logger.info("Redirecting to /render?model=" + modelPath + "&view=" + viewPath + "&ctrl=" + ctrlPath);
-    res.redirect('/render?model=' + modelPath + '&view=' + viewPath + '&ctrl=' + ctrlPath);
-
+  var viewPath = config.default_render.view;
+  var ctrlPath = config.default_render.controller;
+  var modelPath = config.default_render.model;
+  logger.info('Redirecting to /render?model=' + modelPath + '&view=' + viewPath + '&ctrl=' + ctrlPath);
+  res.redirect('/render?model=' + modelPath + '&view=' + viewPath + '&ctrl=' + ctrlPath);
 });
 
-
-async function getFileFromString(URL) {
-    var file;
-    if (URL.startsWith('https://') || URL.startsWith('http://')) {
-        logger.info("Getting external file: " + URL)
-        await axios({
-            url: URL,
-            method: 'GET',
-            headers: { 'User-Agent': 'request' },
-            transformResponse: function (response) {
-                // do not convert the response to JSON or object
-                return response;
-            }
-        }).then(response => {
-            file = response.data;
-        }).catch(err => {
-            console.error(err);
-            throw Error('Error obtaining: ' + URL)
-        })
-
+async function getFileFromString (URL) {
+  var file;
+  if (URL.startsWith('https://') || URL.startsWith('http://')) {
+    logger.info('Getting external file: ' + URL);
+    await governify.httpClient({
+      url: URL,
+      method: 'GET',
+      headers: { 'User-Agent': 'request' },
+      transformResponse: function (response) {
+        // do not convert the response to JSON or object
+        return response;
+      }
+    }).then(response => {
+      file = response.data;
+    }).catch(err => {
+      console.error(err);
+      throw Error('Error obtaining: ' + URL);
+    });
+  } else {
+    // Check first file exist to return null
+    if (fs.existsSync('./src/frontend' + URL)) {
+      logger.info('Getting file locally: ' + URL);
+      file = await fs.readFileSync('./src/frontend' + URL, 'utf8');
     } else {
-        //Check first file exist to return null
-        if (fs.existsSync('./src/frontend' + URL)) {
-            logger.info("Getting file locally: " + URL)
-            file = await fs.readFileSync('./src/frontend' + URL, 'utf8');
-        }
-        else {
-            throw Error('Error obtaining: ' + URL)
-        }
+      throw Error('Error obtaining: ' + URL);
     }
-    //Compatibility for yaml files.
-    if (URL.endsWith('.yaml')) {
-        file = JSON.stringify(jsyaml.safeLoad(file));
-    }
-    return file;
+  }
+  // Compatibility for yaml files.
+  if (URL.endsWith('.yaml')) {
+    file = JSON.stringify(jsyaml.safeLoad(file));
+  }
+  return file;
 }
 
-router.get("/render", async function (req, res) {
-    var ctrl = req.query.ctrl;
-    var model = req.query.model;
-    var view = req.query.view;
+router.get('/render', async function (req, res) {
+  var ctrl = req.query.ctrl;
+  var model = req.query.model;
+  var view = req.query.view;
 
-    if (!ctrl || !view || !model) {
-        logger.warning("No params");
-        res.sendStatus(404);
-    } else {
-        var files;
-        try {
-            let [fileCtrl, fileModel, fileView] = await Promise.all([getFileFromString(ctrl), getFileFromString(model), getFileFromString(view)]);
-            files = {
-                FILE_CONTROLLER: fileCtrl,
-                FILE_MODEL: fileModel,
-                FILE_VIEW: fileView
-            }
-            logger.info("Displaying render");
-            var htmlTemplate = fs.readFileSync('./src/backend/layouts/' + config.layout, 'utf8');
-            var htmlRendered = mustache.render(htmlTemplate, files, {}, ['$_[', ']']);
-            res.send(htmlRendered);
-        } catch (err) {
-            logger.warning('Error getting files: ' + err)
-            res.status(404).send('404 Not found - ' + err.message);
-        }
+  if (!ctrl || !view || !model) {
+    logger.warning('No params');
+    res.sendStatus(404);
+  } else {
+    var files;
+    try {
+      const [fileCtrl, fileModel, fileView] = await Promise.all([getFileFromString(ctrl), getFileFromString(model), getFileFromString(view)]);
+      files = {
+        FILE_CONTROLLER: fileCtrl,
+        FILE_MODEL: fileModel,
+        FILE_VIEW: fileView
+      };
+      logger.info('Displaying render');
+      var htmlTemplate = fs.readFileSync('./src/backend/layouts/' + config.layout, 'utf8');
+      var htmlRendered = mustache.render(htmlTemplate, files, {}, ['$_[', ']']);
+      res.send(htmlRendered);
+    } catch (err) {
+      logger.warning('Error getting files: ' + err);
+      res.status(404).send('404 Not found - ' + err.message);
     }
+  }
 });
 
 router.post('/updateDefaultTPA', function (req, res) {
-    var tpaPath = path.join(__dirname, './../frontend/renders/tpa/template.json');
-    fs.writeFileSync(tpaPath, JSON.stringify(req.body, null, 4));
-    res.sendStatus(204);
+  var tpaPath = path.join(__dirname, './../frontend/renders/tpa/template.json');
+  fs.writeFileSync(tpaPath, JSON.stringify(req.body, null, 4));
+  res.sendStatus(204);
 });
