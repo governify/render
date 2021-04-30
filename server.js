@@ -32,7 +32,7 @@ function check (name, pass, config) {
   return valid;
 }
 
-const deploy = (env) => {
+const deploy = (env, commonsMiddleware) => {
   return new Promise((resolve, reject) => {
     try {
       const bodyParser = require('body-parser');
@@ -47,6 +47,7 @@ const deploy = (env) => {
       const logger = require('./src/backend/logger');
 
       const app = express();
+      app.use("/commons", commonsMiddleware);
 
       if (config.server.enableHTTPBasicAuth) {
         logger.info("Adding 'WWW-Authenticate:' header to every path. Check config/env for getting user and pass");
