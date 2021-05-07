@@ -1,10 +1,27 @@
 'use strict';
 
-var src = require('./src/backend/index');
-var logger = require('./src/backend/logger');
+const governify = require('governify-commons');
 
-//if your project is a npm module:
+const server = require('./server');
 
-module.exports = src;
+const env = process.env.NODE_ENV ? process.env.NODE_ENV : 'production';
 
-//if your is not npm module
+governify.init().then((commonsMiddleware) => {
+  server.deploy(env, commonsMiddleware).catch(err => { console.log(err); });
+});
+
+// quit on ctrl-c when running docker in terminal
+process.on('SIGINT', function onSigint () {
+  console.log('Got SIGINT (aka ctrl-c in docker). Graceful shutdown ', new Date().toISOString());
+  shutdown();
+});
+
+// quit properly on docker stop
+process.on('SIGTERM', function onSigterm () {
+  console.log('Got SIGTERM (docker container stop). Graceful shutdown ', new Date().toISOString());
+  shutdown();
+});
+
+const shutdown = () => {
+  server.undeploy();
+};
