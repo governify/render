@@ -26,14 +26,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 const jsyaml = require('js-yaml');
 const fs = require('fs');
 const path = require('path');
-const mustache = require("mustache");
+const mustache = require('mustache');
 mustache.escape = function (text) { return text; };
 
 /*
  * Export functions and Objects
  */
 const config = {
-    addConfiguration: _addConfiguration
+  addConfiguration: _addConfiguration
 };
 
 module.exports = config;
@@ -41,24 +41,23 @@ module.exports = config;
 /*
  * Implement the functions
  */
-function _addConfiguration(uri, encoding) {
-    var configStringTemplate = null;
-    var configString = null;
+function _addConfiguration (uri, encoding) {
+  var configStringTemplate = null;
+  var configString = null;
 
-    if (!uri) {
-        throw new Error("Parameter URI is required");
-    } else {
-        configStringTemplate = fs.readFileSync(path.join(__dirname, uri), encoding);
-    }
+  if (!uri) {
+    throw new Error('Parameter URI is required');
+  } else {
+    configStringTemplate = fs.readFileSync(path.join(__dirname, uri), encoding);
+  }
 
+  configString = mustache.render(configStringTemplate, process.env, {}, ['$_[', ']']);
 
-    configString = mustache.render(configStringTemplate, process.env, {}, ['$_[', ']']);
+  var newConfigurations = jsyaml.safeLoad(configString)[process.env.NODE_ENV ? process.env.NODE_ENV : 'development'];
 
-    var newConfigurations = jsyaml.safeLoad(configString)[process.env.NODE_ENV ? process.env.NODE_ENV : 'development'];
-
-    for (var c in newConfigurations) {
-        this[c] = newConfigurations[c];
-    }
+  for (var c in newConfigurations) {
+    this[c] = newConfigurations[c];
+  }
 }
 
 /*
