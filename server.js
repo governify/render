@@ -19,9 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 'use strict';
 
-/*
- * Put here your dependencies
- */
+
+
+
 function check (name, pass, config) {
   const nameOK = config.auth.user;
   const passOK = config.auth.password;
@@ -32,7 +32,7 @@ function check (name, pass, config) {
   return valid;
 }
 
-const deploy = (env, commonsMiddleware) => {
+const deploy = (env, commonsMiddleware, callback) => {
   return new Promise((resolve, reject) => {
     try {
       const bodyParser = require('body-parser');
@@ -42,12 +42,13 @@ const deploy = (env, commonsMiddleware) => {
       const compression = require('compression');
       const basicAuth = require('basic-auth');
       const path = require('path');
-
+      const governify = require('governify-commons');
+      const logger = governify.getLogger().tag('initialization');
       const config = require('./src/backend/configurations');
-      const logger = require('./src/backend/logger');
+      
 
       const app = express();
-      app.use("/commons", commonsMiddleware);
+      app.use(commonsMiddleware);
 
       if (config.server.enableHTTPBasicAuth) {
         logger.info("Adding 'WWW-Authenticate:' header to every path. Check config/env for getting user and pass");

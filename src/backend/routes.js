@@ -29,7 +29,7 @@ mustache.escape = function (text) { return text; };
 const governify = require('governify-commons');
 
 const config = require('./configurations');
-const logger = require('./logger');
+const logger = governify.getLogger().tag("routes")
 
 module.exports = router;
 
@@ -81,7 +81,7 @@ router.get('/render', async function (req, res) {
   var view = req.query.view;
 
   if (!ctrl || !view || !model) {
-    logger.warning('No params');
+    logger.warn('No params');
     res.sendStatus(404);
   } else {
     var files;
@@ -97,7 +97,7 @@ router.get('/render', async function (req, res) {
       var htmlRendered = mustache.render(htmlTemplate, files, {}, ['$_[', ']']);
       res.send(htmlRendered);
     } catch (err) {
-      logger.warning('Error getting files: ' + err);
+      logger.warn('Error getting files: ' + err);
       res.status(404).send('404 Not found - ' + err.message);
     }
   }
