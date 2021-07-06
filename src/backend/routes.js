@@ -29,7 +29,7 @@ mustache.escape = function (text) { return text; };
 const governify = require('governify-commons');
 
 const config = require('./configurations');
-const logger = governify.getLogger().tag("routes")
+const logger = governify.getLogger().tag('routes');
 
 module.exports = router;
 

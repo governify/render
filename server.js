@@ -19,9 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 'use strict';
 
-
-
-
 function check (name, pass, config) {
   const nameOK = config.auth.user;
   const passOK = config.auth.password;
@@ -45,9 +42,23 @@ const deploy = (env, commonsMiddleware, callback) => {
       const governify = require('governify-commons');
       const logger = governify.getLogger().tag('initialization');
       const config = require('./src/backend/configurations');
-      
 
       const app = express();
+
+      app.use(
+        bodyParser.urlencoded({
+          limit: '50mb',
+          extended: 'true'
+        })
+      );
+
+      app.use(
+        bodyParser.json({
+          limit: '50mb',
+          type: 'application/json'
+        })
+      );
+
       app.use(commonsMiddleware);
 
       if (config.server.enableHTTPBasicAuth) {
@@ -67,20 +78,6 @@ const deploy = (env, commonsMiddleware, callback) => {
       const routes = require('./src/backend/routes.js');
 
       app.use(compression());
-
-      app.use(
-        bodyParser.urlencoded({
-          limit: '50mb',
-          extended: 'true'
-        })
-      );
-
-      app.use(
-        bodyParser.json({
-          limit: '50mb',
-          type: 'application/json'
-        })
-      );
 
       const frontendPath = path.join(__dirname, '/src/frontend');
       logger.info("Serving '%s' as static folder", frontendPath);
