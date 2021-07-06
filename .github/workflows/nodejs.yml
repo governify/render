@@ -27,8 +27,8 @@ jobs:
     - name: Check syntax
       run: npm run lint
       env:
-# TODO
-#        CI: true
+        CI: true
+# TODO 
 #    - name: Run tests
 #      run: npm run test
 #      env:
