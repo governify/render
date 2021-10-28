@@ -1,4 +1,22 @@
-# 2.1.0 (2021-05-07)
+# [2.2.0](https://github.com/governify/render/compare/v2.1.0...v2.2.0) (2021-10-28)
+
+
+### Bug Fixes
+
+* body parser before commons middleware ([f1238c4](https://github.com/governify/render/commit/f1238c4b1eca97f08996b401346f3bafefe0b35a))
+* github workflow ([14a75fa](https://github.com/governify/render/commit/14a75fa45f63aacebc58dbe1ed52ce2b46d4c30f))
+* rm collectors from external infrastructure ([45812dd](https://github.com/governify/render/commit/45812dda2ce6564f2de1086349236da654d0db47))
+
+
+### Features
+
+* New logs implementation ([3624262](https://github.com/governify/render/commit/36242627a3d24a79214a66f1d06288d9302233d2))
+* update commons v1.14 ([1afa966](https://github.com/governify/render/commit/1afa96605abf56131ff69a06a6b82238f3f31b9c))
+* updated bootstrap5 ([3eda96c](https://github.com/governify/render/commit/3eda96caf4a1328d9b01d3ad8c9deef0fed5ce69))
+
+
+
+# [2.1.0](https://github.com/governify/render/compare/32077a5126b26a3824eb578c98ca89de9ac09ea2...v2.1.0) (2021-05-07)
 
 
 ### Bug Fixes
