@@ -1,5 +1,7 @@
 'use strict';
 
+require('newrelic');
+
 const governify = require('governify-commons');
 const logger = governify.getLogger().tag('initialization');
 
