@@ -1,3 +1,17 @@
+# [2.3.0](https://github.com/governify/render/compare/v2.2.0...v2.3.0) (2023-02-12)
+
+
+### Bug Fixes
+
+* NewRelic error handling ([ec860d2](https://github.com/governify/render/commit/ec860d2647d36ffc9620fde22030ee8020ba56fe))
+
+
+### Features
+
+* Installed newrelic ([7e9be37](https://github.com/governify/render/commit/7e9be37417accf6644995ab3849600e45a6ffa0c))
+
+
+
 # [2.2.0](https://github.com/governify/render/compare/v2.1.0...v2.2.0) (2021-10-28)
 
 
