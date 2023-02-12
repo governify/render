@@ -30,12 +30,13 @@
     "compression": "^1.7.2",
     "cors": "^2.8.4",
     "express": "^4.16.3",
-    "governify-commons": "^1.17.0",
+    "governify-commons": "^1.17.6-0",
     "helmet": "^3.23.3",
     "js-yaml": "^3.14.0",
     "mustache": "^4.0.1",
     "path": "^0.12.7",
-    "winston": "^2.4.2"
+    "winston": "^2.4.2",
+    "newrelic": "latest"
   },
   "devDependencies": {
     "mocha": "^7.1.1",
